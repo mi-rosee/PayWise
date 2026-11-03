@@ -25,6 +25,6 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
-Route::get('/emp.dashboard', function () {
-    return view('auth.emp.dashboard');
+Route::get('/empdb', function () {
+    return view('auth.empdb');
 });
