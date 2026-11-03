@@ -162,7 +162,7 @@
         <div class="mt-7 text-center">
             <p class="text-xs text-slate-400">
                 New to Payroll Portal? 
-                <a href="register.blade.php" onclick="showNotification('Account Creation', 'Redirecting to onboarding portal...')" class="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline ml-0.5">Create an account</a>
+                <a href="/register" onclick="showNotification('Account Creation', 'Redirecting to onboarding portal...')" class="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline ml-0.5">Create an account</a>
             </p>
         </div>
 

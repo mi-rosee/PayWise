@@ -39,7 +39,6 @@
             background-color: #020617;
             color: #f8fafc;
         }
-        /* Custom high-contrast dark form inputs with glowing focus states */
         .form-input-dark {
             transition: all 0.2s ease-in-out;
             background-color: #020617;
@@ -58,9 +57,8 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 selection:bg-emerald-500 selection:text-slate-950">
 
-    
-<!-- Card Container -->
-<div class="w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl shadow-emerald-950/20 p-8 sm:p-8 border border-slate-800 relative glow-emerald transition-all duration-300 hover:scale-[1.01] hover:border-emerald-300/50 hover:shadow-emerald-600/20">        
+    <!-- Card Container -->
+    <div class="w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl shadow-emerald-950/20 p-8 sm:p-8 border border-slate-800 relative glow-emerald transition-all duration-300 hover:scale-[1.01] hover:border-emerald-300/50 hover:shadow-emerald-600/20">        
         <!-- App Header / Logo placeholder -->
         <div class="mb-6">
             <div class="flex items-center space-x-2 mb-3">
@@ -74,7 +72,7 @@
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Create account</h1>
             <p class="text-sm text-slate-400 mt-1 font-medium">
                 Already registered? 
-                <a href="login.blade.php" onclick="showToast('Navigating to Sign in page...', 'info');" class="text-emerald-400 font-bold hover:text-emerald-300 underline underline-offset-2 transition-colors">Sign in</a>
+                <a href="/" onclick="showToast('Navigating to Sign in page...', 'info');" class="text-emerald-400 font-bold hover:text-emerald-300 underline underline-offset-2 transition-colors">Sign in</a>
             </p>
         </div>
 
@@ -250,25 +248,6 @@
         <span id="toastMessage" class="font-medium">Notification message</span>
     </div>
 
-    <!-- Success Modal -->
-<div id="successModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex hidden items-center justify-center p-4 z-50 opacity-0 transition-opacity duration-300">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-300 shadow-2xl">
-        <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
-            <i class="fa-solid fa-check"></i>
-        </div>
-        <h3 class="text-xl font-black text-white mb-1">Account Created!</h3>
-        <p class="text-xs text-slate-400 mb-6 leading-relaxed">
-            Welcome onboard! We have sent a confirmation email to <span id="userEmailDisplay" class="font-semibold text-emerald-400"></span>.
-        </p>
-        <button 
-            onclick="closeModal()" 
-            class="w-full py-2.5 px-4 bg-emerald-400 hover:bg-emerald-300 text-slate-950 text-xs font-black rounded-lg shadow-lg shadow-emerald-500/20 transition-all"
-        >
-            Continue to Dashboard
-        </button>
-    </div>
-</div>
-
     <script>
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
@@ -296,22 +275,7 @@
 
         function handleFormSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('workEmail').value;
-            document.getElementById('userEmailDisplay').innerText = email || 'user@company.com';
-            
-            const modal = document.getElementById('successModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-            }, 10);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('successModal');
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            showToast('Account creation submitted!', 'success');
         }
     </script>
 </body>
