@@ -74,7 +74,7 @@
             <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Create account</h1>
             <p class="text-sm text-slate-400 mt-1 font-medium">
                 Already registered? 
-                <a href="login.blade.php" onclick="showToast('Navigating to Sign in page...', 'info');" class="text-emerald-400 font-bold hover:text-emerald-300 underline underline-offset-2 transition-colors">Sign in</a>
+                <a href="/" onclick="showToast('Navigating to Sign in page...', 'info');" class="text-emerald-400 font-bold hover:text-emerald-300 underline underline-offset-2 transition-colors">Sign in</a>
             </p>
         </div>
 
