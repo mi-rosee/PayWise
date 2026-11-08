@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Create Account - PayWise Payroll</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -79,8 +80,9 @@
         </div>
 
         <!-- Registration Form -->
-        <form id="registrationForm" onsubmit="handleFormSubmit(event)" novalidate class="space-y-4">
-            
+        <form id="registrationForm" action="/register" method="POST" onsubmit="handleFormSubmit(event)" novalidate class="space-y-4">
+    @csrf
+                
             <!-- First Name & Last Name Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
@@ -270,49 +272,98 @@
 </div>
 
     <script>
-        function togglePasswordVisibility(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+    function togglePasswordVisibility(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
         }
+    }
 
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+    function showToast(message, type = 'info') {
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        if (toast && toastMessage) {
             toastMessage.innerText = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
+    }
 
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('workEmail').value;
-            document.getElementById('userEmailDisplay').innerText = email || 'user@company.com';
-            
-            const modal = document.getElementById('successModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-            }, 10);
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+
+        const form = document.getElementById('registrationForm');
+        const formData = new FormData(form);
+
+        // Client-side password matching check
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            showToast('Passwords do not match!', 'error');
+            return;
         }
 
-        function closeModal() {
-            const modal = document.getElementById('successModal');
+        try {
+            // Send data asynchronously to Laravel backend via POST
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Success: Database entry was created!
+                const email = document.getElementById('workEmail').value;
+                const emailDisplay = document.getElementById('userEmailDisplay');
+                if (emailDisplay) {
+                    emailDisplay.innerText = email || 'user@company.com';
+                }
+                
+                // Trigger your success modal
+                const modal = document.getElementById('successModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                    }, 10);
+                }
+                
+                form.reset();
+            } else {
+                // Failure: Laravel validation errors (e.g., email already taken)
+                showToast('Registration failed. Check your inputs.', 'error');
+                console.error('Validation errors:', data.errors);
+            }
+        } catch (error) {
+            console.error('Network or server error:', error);
+            showToast('An unexpected error occurred.', 'error');
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('successModal');
+        if (modal) {
             modal.classList.add('opacity-0');
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
         }
-    </script>
+    }
+</script>
 </body>
 </html>

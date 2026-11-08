@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\AuthController; 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,6 +20,9 @@ Route::get('/', function () {
 Route::get('/register', function () {
     return view('auth.register');
 });
+
+// 2. Add this POST route to handle form submission
+Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/login', function () {
     return view('auth.login');
