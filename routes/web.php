@@ -1,17 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController; 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -27,11 +17,26 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
-Route::get('/empdb', function () {
-    return view('auth.empdb');
-});
-
 Route::get('/employee/dashboard', function () {
     return view('employee.dashboard');
 })->name('employee.dashboard');
-Displaying web.php.
+
+Route::get('/employee/payslips', function () {
+    return view('employee.dashboard');
+})->name('employee.payslips');
+
+Route::get('/employee/attendance', function () {
+    return view('employee.dashboard');
+})->name('employee.attendance');
+
+Route::get('/employee/leave', function () {
+    return view('employee.dashboard');
+})->name('employee.leave');
+
+Route::get('/admin/dashboard', function () {
+    return view('employee.dashboard');
+})->name('admin.dashboard');
+
+Route::get('/management/dashboard', function () {
+    return view('employee.dashboard');
+})->name('management.dashboard');
