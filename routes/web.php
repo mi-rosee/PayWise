@@ -14,14 +14,13 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/register', function () {
     return view('auth.register');
 });
 
-// 2. Add this POST route to handle form submission
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/login', function () {
@@ -31,3 +30,8 @@ Route::get('/login', function () {
 Route::get('/empdb', function () {
     return view('auth.empdb');
 });
+
+Route::get('/employee/dashboard', function () {
+    return view('employee.dashboard');
+})->name('employee.dashboard');
+Displaying web.php.
