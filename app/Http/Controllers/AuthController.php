@@ -26,33 +26,34 @@ class AuthController extends Controller
 
     public function showEmployeeDashboard()
     {
-        return view('auth.empdb');
+        return view('employee.dashboard');
     }
 
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'firstName'   => ['required', 'string', 'max:255'],
-            'lastName'    => ['required', 'string', 'max:255'],
-            'workEmail'   => ['required', 'email', 'max:255', 'unique:users,email'],
-            'companyCode' => ['nullable', 'string', 'max:255'],
-            'role'        => ['nullable', 'string', 'max:255'],
-            'password'    => ['required', 'string', 'min:8'],
+            'first_name'   => ['required', 'string', 'max:255'],
+            'last_name'    => ['required', 'string', 'max:255'],
+            'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
+            'company_code' => ['nullable', 'string', 'max:255'],
+            'role'         => ['nullable', 'string', 'max:255'],
+            'password'     => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         $user = User::create([
-            'first_name'   => $validated['firstName'],
-            'last_name'    => $validated['lastName'],
-            'email'        => $validated['workEmail'],
-            'company_code' => $validated['companyCode'] ?? null,
+            'first_name'   => $validated['first_name'],
+            'last_name'    => $validated['last_name'],
+            'email'        => $validated['email'],
+            'company_code' => $validated['company_code'] ?? null,
             'role'         => $validated['role'] ?? 'Employee',
             'password'     => Hash::make($validated['password']),
         ]);
 
-        return response()->json([
-            'message' => 'Account created successfully.',
-            'user'    => $user,
-        ], 201);
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('employee.dashboard')
+            ->with('status', 'Account created successfully.');
     }
 
     public function login(Request $request)
@@ -63,7 +64,6 @@ class AuthController extends Controller
             'role_tab'   => ['nullable', 'string'],
         ]);
 
-        // Match against `email` (or `id` if the user enters a numeric ID)
         $loginField = filter_var($credentials['identifier'], FILTER_VALIDATE_EMAIL)
             ? 'email'
             : 'id';
@@ -74,9 +74,9 @@ class AuthController extends Controller
             $loginField => $credentials['identifier'],
             'password'  => $credentials['password'],
         ], $remember)) {
-            return response()->json([
-                'message' => 'Invalid email/ID or password.',
-            ], 401);
+            return back()
+                ->withInput($request->only('identifier', 'role_tab'))
+                ->withErrors(['identifier' => 'Invalid email/ID or password.']);
         }
 
         $request->session()->regenerate();
@@ -85,9 +85,19 @@ class AuthController extends Controller
         $isAdmin = in_array($user->role, ['HR / Admin', 'Payroll Admin', 'HR', 'Administrator'])
             || ($credentials['role_tab'] ?? '') === 'HR / Admin';
 
-        return response()->json([
-            'message'  => 'Login successful.',
-            'redirect' => $isAdmin ? url('/admindb') : url('/empdb'),
-        ]);
+        if ($isAdmin) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('employee.dashboard');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

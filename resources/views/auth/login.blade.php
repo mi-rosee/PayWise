@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sign in - Payroll Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
@@ -66,10 +66,10 @@
     </div>
 
     <!-- Main Card Container -->
-    <div class="w-full max-w-[420px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-7 sm:p-15 relative glow-emerald transition-all duration-300 hover:scale-[1.01] hover:border-emerald-500/50 hover:shadow-emerald-500/10">
+    <div class="w-full max-w-[420px] bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-7 sm:p-10 relative glow-emerald transition-all duration-300 hover:scale-[1.01] hover:border-emerald-500/50 hover:shadow-emerald-500/10">
         
         <!-- Logo Header Section -->
-        <div class="mb-1">
+        <div class="mb-2">
             <div class="flex items-center space-x-2">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-emerald-400 p-0.5 flex items-center justify-center shadow-lg">
                     <div class="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center">
@@ -97,7 +97,10 @@
         </div>
 
         <!-- Form -->
-        <form id="signInForm" onsubmit="handleSignIn(event)" class="space-y-4">
+        <form id="signInForm" action="{{ route('login') }}" method="POST" onsubmit="handleSignIn(event)" class="space-y-4">
+            @csrf
+            <input type="hidden" id="roleTabInput" name="role_tab" value="Employee">
+
             <!-- Email / ID Field -->
             <div>
                 <label id="identifierLabel" for="identifier" class="block text-xs font-semibold text-slate-200 mb-1.5">
@@ -106,8 +109,9 @@
                 <input 
                     type="text" 
                     id="identifier" 
+                    name="identifier"
                     required 
-                    placeholder="e.g. EMP-00123" 
+                    placeholder="e.g. EMP-00123 or name@company.com" 
                     class="w-full px-3.5 py-2.5 text-sm text-slate-100 bg-slate-950 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-400/20 focus:border-emerald-400 placeholder-slate-600 transition-colors"
                 />
             </div>
@@ -116,12 +120,13 @@
             <div>
                 <div class="flex items-center justify-between mb-1.5">
                     <label for="password" class="block text-xs font-semibold text-slate-300">Password</label>
-                    <a href="#" onclick="showNotification('Info', 'Password reset instructions sent to your email.')" class="text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:underline">Forgot password?</a>
+                    <a href="#" onclick="showNotification('Info', 'Password reset instructions sent to your email.'); return false;" class="text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:underline">Forgot password?</a>
                 </div>
                 <div class="input-border rounded-lg border bg-slate-950 px-3.5 py-2.5 flex items-center justify-between transition-all">
                     <input 
                         type="password" 
                         id="password" 
+                        name="password"
                         required 
                         placeholder="Enter your password" 
                         class="w-full bg-transparent text-sm text-darkText placeholder-slate-600 outline-none pr-2"
@@ -142,6 +147,7 @@
                 <input 
                     type="checkbox" 
                     id="remember" 
+                    name="remember"
                     class="w-4 h-4 bg-slate-950 border-slate-700 rounded text-emerald-500 focus:ring-emerald-500 cursor-pointer accent-emerald-500"
                 />
                 <label for="remember" class="ml-2.5 text-xs text-slate-400 cursor-pointer select-none">
@@ -162,7 +168,7 @@
         <div class="mt-7 text-center">
             <p class="text-xs text-slate-400">
                 New to Payroll Portal? 
-                <a href="register" onclick="showNotification('Account Creation', 'Redirecting to onboarding portal...')" class="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline ml-0.5">Create an account</a>
+                <a href="{{ route('register') }}" onclick="showNotification('Account Creation', 'Redirecting to onboarding portal...')" class="font-semibold text-emerald-400 hover:text-emerald-300 hover:underline ml-0.5">Create an account</a>
             </p>
         </div>
 
@@ -173,6 +179,7 @@
 
         function selectRole(role) {
             currentRole = role;
+            document.getElementById('roleTabInput').value = role;
             const employeeTab = document.getElementById('employeeTab');
             const hrTab = document.getElementById('hrTab');
             const identifierLabel = document.getElementById('identifierLabel');
@@ -182,7 +189,7 @@
                 employeeTab.className = "flex-1 py-2 text-sm font-bold text-slate-950 bg-emerald-400 rounded-lg shadow-sm transition-all duration-200";
                 hrTab.className = "flex-1 py-2 text-sm font-medium text-slate-400 rounded-lg transition-all duration-200 hover:text-white";
                 identifierLabel.innerText = "Employee ID or work email";
-                identifierInput.placeholder = "e.g. EMP-00123";
+                identifierInput.placeholder = "e.g. EMP-00123 or name@company.com";
             } else {
                 hrTab.className = "flex-1 py-2 text-sm font-bold text-slate-950 bg-emerald-400 rounded-lg shadow-sm transition-all duration-200";
                 employeeTab.className = "flex-1 py-2 text-sm font-medium text-slate-400 rounded-lg transition-all duration-200 hover:text-white";
@@ -215,9 +222,35 @@
             }, 3000);
         }
 
-        function handleSignIn(e) {
+        async function handleSignIn(e) {
             e.preventDefault();
-            showNotification('Success', `Logging you into Payroll Portal as ${currentRole}...`);
+            const form = document.getElementById('signInForm');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("{{ route('login') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showNotification('Success', data.message || `Logging you into Payroll Portal as ${currentRole}...`);
+                    setTimeout(() => {
+                        window.location.href = data.redirect || "{{ route('employee.dashboard') }}";
+                    }, 500);
+                } else {
+                    showNotification('Sign in failed', data.message || 'Invalid credentials.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Error', 'Unable to sign in right now.');
+            }
         }
     </script>
 </body>

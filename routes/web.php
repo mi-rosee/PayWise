@@ -1,42 +1,51 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('auth.login');
-});
+Route::get('/', [AuthController::class, 'showLogin'])->name('home');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/register', function () {
-    return view('auth.register');
-});
-
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::get('/login', function () {
-    return view('auth.login');
-});
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/employee/dashboard', function () {
-    return view('employee.dashboard');
-})->name('employee.dashboard');
+Route::get('/employee/dashboard', [AuthController::class, 'showEmployeeDashboard'])
+    ->name('employee.dashboard');
 
-Route::get('/employee/payslips', function () {
-    return view('employee.dashboard');
-})->name('employee.payslips');
+Route::get('/employee/payslips', fn () => view('employee.payslips'))
+    ->name('employee.payslips');
 
-Route::get('/employee/attendance', function () {
-    return view('employee.dashboard');
-})->name('employee.attendance');
+Route::get('/employee/attendance', fn () => view('employee.attendance'))
+    ->name('employee.attendance');
 
-Route::get('/employee/leave', function () {
-    return view('employee.dashboard');
-})->name('employee.leave');
+Route::get('/employee/leave', fn () => view('employee.attendance'))
+    ->name('employee.leave');
 
-Route::get('/admin/dashboard', function () {
-    return view('employee.dashboard');
-})->name('admin.dashboard');
+Route::get('/employee/profile', fn () => view('employee.profile'))
+    ->name('employee.profile');
 
-Route::get('/management/dashboard', function () {
-    return view('employee.dashboard');
-})->name('management.dashboard');
+Route::put('/employee/profile', fn (Illuminate\Http\Request $request) => back()->with('status', 'Profile details updated.'))
+    ->name('employee.profile.update');
+
+Route::put('/employee/profile/password', fn (Illuminate\Http\Request $request) => back()->with('status', 'Password updated.'))
+    ->name('employee.profile.password');
+
+Route::get('/admin/dashboard', [AuthController::class, 'showAdminDashboard'])
+    ->name('admin.dashboard');
+
+Route::get('/management/dashboard', fn () => view('employee.dashboard'))
+    ->name('management.dashboard');
+
+Route::post('/employee/leave', function (Illuminate\Http\Request $request) {
+    $request->validate([
+        'leave_type' => ['required', 'string', 'max:100'],
+        'start_date' => ['required', 'date'],
+        'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
+        'reason'     => ['nullable', 'string', 'max:500'],
+    ]);
+
+    return back()->with('status', 'Leave request submitted for review.');
+})->name('employee.leave.store');
